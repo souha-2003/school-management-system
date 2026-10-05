@@ -1,0 +1,9 @@
+{
+    "Tenant": true,
+    "Auth": true,
+    "Staff": true,
+    "Academic": true,
+    "Student": true,
+    "Timetable": true,
+    "Communication": true
+}
