@@ -20,15 +20,14 @@ return new class extends Migration
             $table->string('job_title', 100);
             $table->string('specialization', 100)->nullable();
             $table->date('hire_date')->nullable();
-            $table->enum('status', ['active', 'on_leave', 'terminated'])->default('active');
+            $table->enum('status', ['active', 'on_leave', 'transferred', 'terminated', 'retired', 'resigned'])->default('active');
+            $table->boolean('is_archived')->default(false);
             $table->timestamps(6);
-            $table->softDeletes('deleted_at', 6);
 
-            $table->tinyInteger('active_flag')->virtualAs('IF(deleted_at IS NULL, 1, NULL)')->nullable();
-
-            $table->unique(['school_id', 'employee_number', 'active_flag'], 'uq_staff_emp_num');
+            $table->unique(['school_id', 'employee_number'], 'uq_staff_emp_num');
             $table->unique('user_id', 'uq_staff_user');
             $table->index('school_id', 'idx_staff_school');
+            $table->index('is_archived', 'idx_staff_archived');
         });
     }
 

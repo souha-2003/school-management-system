@@ -133,8 +133,9 @@ erDiagram
 
 1. **دعم الـ UUIDs تلقائياً:**
    * تم استخدام `CHAR(36) NOT NULL DEFAULT (UUID())` في كافة المعرفات الأساسية.
-2. **حل مشكلة الـ Soft Deletes مع الـ Unique Keys:**
-   * تم استخدام العمود الافتراضي `active_flag` المرتبط بـ `deleted_at` لمنع تكرار الهويات النشطة والسماح بها بعد الحذف.
+2. **إدارة دورة حياة السجلات (Record Lifecycle):**
+   * **الكيانات الشخصية** (`staff`, `students`, `parents`): تستخدم نهج **الأرشفة وتغيير الحالة** عبر حقل `is_archived` (boolean) وحقل `status` (enum) بدلاً من الحذف الناعم، لأن هذه السجلات لها ارتباطات تاريخية ومالية ولا يجب أن تُحذف.
+   * **الكيانات الهيكلية** (`schools`, `subjects`, `classrooms`...): تستخدم **الحذف الناعم** (`deleted_at`) مع العمود الافتراضي `active_flag` لمنع تكرار القيم الفريدة بين السجلات النشطة فقط.
 3. **التحديث التلقائي للوقت (`updated_at`):**
    * الاعتماد على ميزة MySQL المدمجة:
      `DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6)`.

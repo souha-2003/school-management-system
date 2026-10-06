@@ -21,14 +21,13 @@ return new class extends Migration
             $table->string('national_id', 50)->nullable();
             $table->string('photo_url', 500)->nullable();
             $table->json('metadata');
+            $table->boolean('is_archived')->default(false);
             $table->timestamps(6);
-            $table->softDeletes('deleted_at', 6);
 
-            $table->tinyInteger('active_flag')->virtualAs('IF(deleted_at IS NULL, 1, NULL)')->nullable();
-
-            $table->unique(['school_id', 'admission_number', 'active_flag'], 'uq_students_admission_num');
-            $table->unique(['school_id', 'national_id', 'active_flag'], 'uq_students_national_id');
+            $table->unique(['school_id', 'admission_number'], 'uq_students_admission_num');
+            $table->unique(['school_id', 'national_id'], 'uq_students_national_id');
             $table->index('school_id', 'idx_students_school');
+            $table->index('is_archived', 'idx_students_archived');
         });
 
         // 2. Parents / Guardians
@@ -42,14 +41,14 @@ return new class extends Migration
             $table->string('national_id', 50)->nullable();
             $table->string('occupation', 150)->nullable();
             $table->text('address')->nullable();
+            $table->enum('status', ['active', 'inactive'])->default('active');
+            $table->boolean('is_archived')->default(false);
             $table->timestamps(6);
-            $table->softDeletes('deleted_at', 6);
 
-            $table->tinyInteger('active_flag')->virtualAs('IF(deleted_at IS NULL, 1, NULL)')->nullable();
-
-            $table->unique(['school_id', 'national_id', 'active_flag'], 'uq_parents_national_id');
+            $table->unique(['school_id', 'national_id'], 'uq_parents_national_id');
             $table->unique('user_id', 'uq_parents_user');
             $table->index('school_id', 'idx_parents_school');
+            $table->index('is_archived', 'idx_parents_archived');
         });
 
         // 3. Student-Parent Pivot (Many-to-Many)
