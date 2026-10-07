@@ -52,6 +52,14 @@ use OpenApi\Attributes as OA;
     name: "Finance",
     description: "الرسوم الدراسية، الفواتير، سندات القبض، والخصومات"
 )]
+#[OA\Tag(
+    name: "Schools",
+    description: "إدارة المدارس والمنشآت التعليمية والاشتراكات"
+)]
+#[OA\Tag(
+    name: "School Settings",
+    description: "إدارة إعدادات وهوية وتوقيت الدوام للمدرسة"
+)]
 class OpenApiSpec
 {
 }

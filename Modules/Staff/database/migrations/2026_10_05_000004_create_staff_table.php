@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('staff', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('school_id')->constrained('schools')->cascadeOnDelete();
-            $table->foreignUuid('user_id')->nullable()->constrained('users')->restrictOnDelete();
+            $table->foreignUuid('user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->string('employee_number', 50)->nullable();
             $table->string('full_name', 255);
             $table->string('phone_number', 50);

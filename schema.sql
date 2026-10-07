@@ -93,7 +93,7 @@ CREATE TABLE school_settings (
 
 CREATE TABLE users (
     id CHAR(36) NOT NULL DEFAULT (UUID()),
-    school_id CHAR(36) NOT NULL,
+    school_id CHAR(36) NULL, -- NULL for Platform Super Admin
     username VARCHAR(100) NOT NULL, -- اسم مستخدم مولد تلقائياً (e.g. ROW-FAM-1029, ROW-STF-0104)
     email VARCHAR(255) NULL,
     phone_number VARCHAR(50) NOT NULL,
