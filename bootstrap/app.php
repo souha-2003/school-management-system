@@ -17,7 +17,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        $middleware->alias([
+            'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
+            'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+            'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+            'tenant' => \Modules\Tenant\Http\Middleware\IdentifyTenant::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         // 1. Unified Validation Errors (422)
@@ -54,7 +59,7 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         // 4. Unified Forbidden / Permission Errors (403)
-        $exceptions->render(function (AccessDeniedHttpException $e, Request $request) {
+        $exceptions->render(function (AccessDeniedHttpException|\Spatie\Permission\Exceptions\UnauthorizedException $e, Request $request) {
             if ($request->is('api/*') || $request->expectsJson()) {
                 return response()->json([
                     'success' => false,

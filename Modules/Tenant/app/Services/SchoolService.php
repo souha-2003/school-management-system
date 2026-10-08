@@ -2,9 +2,13 @@
 
 namespace Modules\Tenant\Services;
 
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Modules\Staff\Models\Staff;
 use Modules\Tenant\Models\School;
 use Modules\Tenant\Models\SchoolSetting;
+use Spatie\Permission\Models\Role;
 
 class SchoolService
 {
@@ -83,28 +87,36 @@ class SchoolService
             // 3. Create initial School Manager account if provided
             if (!empty($managerData)) {
                 $rawPassword = $managerData['password'] ?? 'School@' . rand(1000, 9999);
-                $userId = (string) \Illuminate\Support\Str::uuid();
-                $staffId = (string) \Illuminate\Support\Str::uuid();
                 $username = strtoupper($school->code) . '-ADM-' . rand(1000, 9999);
 
-                DB::table('users')->insert([
-                    'id' => $userId,
+                // Ensure school_admin role exists
+                $schoolAdminRole = Role::firstOrCreate([
+                    'name' => 'school_admin',
+                    'guard_name' => 'web',
+                ]);
+
+                // Create user via Eloquent
+                $user = User::create([
                     'school_id' => $school->id,
                     'username' => $username,
                     'email' => $managerData['email'] ?? null,
                     'phone_number' => $managerData['phone_number'],
-                    'password' => \Illuminate\Support\Facades\Hash::make($rawPassword),
+                    'password' => $rawPassword,
                     'user_type' => 'staff',
                     'status' => 'active',
-                    'metadata' => json_encode(['initial_role' => 'school_admin']),
-                    'created_at' => now(),
-                    'updated_at' => now(),
+                    'metadata' => [
+                        'initial_role' => 'school_admin',
+                        'must_change_password' => true,
+                    ],
                 ]);
 
-                DB::table('staff')->insert([
-                    'id' => $staffId,
+                // Assign Spatie role
+                $user->assignRole($schoolAdminRole);
+
+                // Create staff record via Eloquent
+                Staff::create([
                     'school_id' => $school->id,
-                    'user_id' => $userId,
+                    'user_id' => $user->id,
                     'employee_number' => 'EMP-0001',
                     'full_name' => $managerData['full_name'],
                     'phone_number' => $managerData['phone_number'],
@@ -112,8 +124,6 @@ class SchoolService
                     'job_title' => 'مدير المدرسة',
                     'status' => 'active',
                     'is_archived' => false,
-                    'created_at' => now(),
-                    'updated_at' => now(),
                 ]);
 
                 $school->setAttribute('manager_credentials', [
@@ -173,5 +183,40 @@ class SchoolService
     public function deleteSchool($school)
     {
         return $school->delete();
+    }
+
+    /**
+     * Upload and update school logo.
+     */
+    public function uploadLogo($school, $file): School
+    {
+        if ($school->logo_url && str_contains($school->logo_url, '/storage/schools/')) {
+            $oldPath = str_replace(asset('storage') . '/', '', $school->logo_url);
+            Storage::disk('public')->delete($oldPath);
+        }
+
+        $path = $file->store("schools/{$school->id}/branding", 'public');
+        $url = asset('storage/' . $path);
+
+        $school->update(['logo_url' => $url]);
+
+        return $school->load('settings');
+    }
+
+    /**
+     * Upload and update school favicon.
+     */
+    public function uploadFavicon($school, $file): SchoolSetting
+    {
+        $settings = $school->settings;
+        if ($settings?->favicon_url && str_contains($settings->favicon_url, '/storage/schools/')) {
+            $oldPath = str_replace(asset('storage') . '/', '', $settings->favicon_url);
+            Storage::disk('public')->delete($oldPath);
+        }
+
+        $path = $file->store("schools/{$school->id}/branding", 'public');
+        $url = asset('storage/' . $path);
+
+        return $this->updateSchoolSettings($school, ['favicon_url' => $url]);
     }
 }

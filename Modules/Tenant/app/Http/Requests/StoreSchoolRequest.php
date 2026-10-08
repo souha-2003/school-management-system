@@ -16,6 +16,14 @@ class StoreSchoolRequest extends FormRequest
     }
 
     /**
+     * Reserved subdomains prohibited for schools.
+     */
+    public const RESERVED_SUBDOMAINS = [
+        'admin', 'administrator', 'api', 'app', 'auth', 'dashboard', 'dev', 'developer',
+        'mail', 'portal', 'root', 'schools', 'staging', 'support', 'system', 'tenant', 'test', 'www'
+    ];
+
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
@@ -34,6 +42,8 @@ class StoreSchoolRequest extends FormRequest
                 'nullable',
                 'string',
                 'max:100',
+                'regex:/^[a-z0-9]+(-[a-z0-9]+)*$/i',
+                Rule::notIn(self::RESERVED_SUBDOMAINS),
                 Rule::unique('schools', 'subdomain')->whereNull('deleted_at'),
             ],
             'email' => ['nullable', 'email', 'max:255'],

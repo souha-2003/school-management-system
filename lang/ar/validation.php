@@ -60,6 +60,7 @@ return [
         'string'  => 'يجب ألا يقل طول نص :attribute عن :min أحرف.',
         'array'   => 'يجب أن يحتوي :attribute على الأقل على :min عناصر.',
     ],
+    'not_in'               => 'قيمة :attribute محجوزة للنظام ولا يمكن استخدامها.',
     'numeric'              => 'يجب أن يكون :attribute رقماً.',
     'present'              => 'يجب تقديم حقل :attribute.',
     'regex'                => 'صيغة :attribute غير صالحة.',
@@ -89,7 +90,8 @@ return [
         'email'                        => 'البريد الإلكتروني',
         'phone'                        => 'رقم الهاتف',
         'address'                      => 'العنوان',
-        'logo_url'                     => 'شعار المدرسة',
+        'logo_url'               
+              => 'شعار المدرسة',
         'status'                       => 'حالة المدرسة',
         'settings'                     => 'إعدادات المدرسة',
         'settings.subscription_plan'   => 'باقة الاشتراك',
@@ -109,6 +111,8 @@ return [
         'manager.phone_number'         => 'هاتف مدير المدرسة',
         'manager.email'                => 'بريد مدير المدرسة',
         'manager.password'             => 'كلمة مرور مدير المدرسة',
+        'identifier'                   => 'اسم المستخدم أو البريد أو رقم الهاتف',
+        'password'                     => 'كلمة المرور',
     ],
 
 ];

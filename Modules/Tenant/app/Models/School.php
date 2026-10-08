@@ -5,8 +5,10 @@ namespace Modules\Tenant\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Modules\Staff\Models\Staff;
 
 class School extends Model
 {
@@ -54,5 +56,13 @@ class School extends Model
     public function settings(): HasOne
     {
         return $this->hasOne(SchoolSetting::class, 'school_id', 'id');
+    }
+
+    /**
+     * Staff members employed by this school.
+     */
+    public function staff(): HasMany
+    {
+        return $this->hasMany(Staff::class, 'school_id', 'id');
     }
 }

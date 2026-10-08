@@ -38,6 +38,8 @@ class UpdateSchoolRequest extends FormRequest
                 'nullable',
                 'string',
                 'max:100',
+                'regex:/^[a-z0-9]+(-[a-z0-9]+)*$/i',
+                Rule::notIn(StoreSchoolRequest::RESERVED_SUBDOMAINS),
                 Rule::unique('schools', 'subdomain')->whereNull('deleted_at')->ignore($schoolId),
             ],
             'email' => ['nullable', 'email', 'max:255'],

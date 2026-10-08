@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Modules\Tenant\Http\Requests\StoreSchoolRequest;
 use Modules\Tenant\Http\Requests\UpdateSchoolRequest;
+use Modules\Tenant\Http\Requests\UploadSchoolLogoRequest;
 use Modules\Tenant\Http\Resources\SchoolResource;
 use Modules\Tenant\Services\SchoolService;
 
@@ -83,5 +84,16 @@ class SchoolController extends Controller
         return response()->json([
             'message' => 'School deleted successfully.',
         ]);
+    }
+
+    /**
+     * Upload logo image for the specified school.
+     */
+    public function uploadLogo(UploadSchoolLogoRequest $request, string $id)
+    {
+        $school = $this->schoolService->getSchoolById($id);
+        $updatedSchool = $this->schoolService->uploadLogo($school, $request->file('logo'));
+
+        return new SchoolResource($updatedSchool);
     }
 }

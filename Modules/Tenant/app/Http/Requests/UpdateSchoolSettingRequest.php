@@ -4,6 +4,7 @@ namespace Modules\Tenant\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Modules\Tenant\Models\SchoolSetting;
 
 class UpdateSchoolSettingRequest extends FormRequest
 {
@@ -22,17 +23,38 @@ class UpdateSchoolSettingRequest extends FormRequest
      */
     public function rules(): array
     {
+        $schoolId = $this->route('school');
+        $existingSetting = $schoolId ? SchoolSetting::where('school_id', $schoolId)->first() : null;
+
         return [
             'subscription_plan' => ['sometimes', 'required', 'string', 'max:50'],
-            'subscription_start_date' => ['sometimes', 'required', 'date'],
+            'subscription_start_date' => [
+                'sometimes',
+                'required',
+                'date',
+                function ($attribute, $value, $fail) use ($existingSetting) {
+                    $endDate = $this->input('subscription_end_date')
+                        ?? ($existingSetting?->subscription_end_date instanceof \DateTimeInterface
+                            ? $existingSetting->subscription_end_date->format('Y-m-d')
+                            : $existingSetting?->subscription_end_date);
+
+                    if ($endDate && strtotime($value) > strtotime($endDate)) {
+                        $fail('تاريخ بداية الاشتراك لا يمكن أن يكون بعد تاريخ نهاية الاشتراك.');
+                    }
+                },
+            ],
             'subscription_end_date' => [
                 'sometimes',
                 'required',
                 'date',
-                function ($attribute, $value, $fail) {
-                    $startDate = $this->input('subscription_start_date');
+                function ($attribute, $value, $fail) use ($existingSetting) {
+                    $startDate = $this->input('subscription_start_date')
+                        ?? ($existingSetting?->subscription_start_date instanceof \DateTimeInterface
+                            ? $existingSetting->subscription_start_date->format('Y-m-d')
+                            : $existingSetting?->subscription_start_date);
+
                     if ($startDate && strtotime($value) < strtotime($startDate)) {
-                        $fail(__('validation.after_or_equal', ['attribute' => $attribute, 'date' => 'subscription_start_date']));
+                        $fail('تاريخ نهاية الاشتراك يجب أن يكون مساوياً أو بعد تاريخ بداية الاشتراك.');
                     }
                 },
             ],

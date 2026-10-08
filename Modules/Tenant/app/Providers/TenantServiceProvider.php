@@ -35,12 +35,15 @@ class TenantServiceProvider extends ModuleServiceProvider
     ];
 
     /**
-     * Define module schedules.
-     * 
-     * @param $schedule
+     * Register module services.
      */
-    // protected function configureSchedules(Schedule $schedule): void
-    // {
-    //     $schedule->command('inspire')->hourly();
-    // }
+    public function register(): void
+    {
+        parent::register();
+
+        $this->app->singleton(\Modules\Tenant\Services\TenantContext::class, function () {
+            return new \Modules\Tenant\Services\TenantContext();
+        });
+    }
 }
+
