@@ -15,6 +15,7 @@ class SchoolDocs
 * **الفلترة بالحالة (`status`):** يقبل (`active`، `suspended`، `pending_setup`).
 * **الترقيم الصفحي:** تدعم الاستجابة معايير لارافيل للترقيم الصفحي مع حقول `links` و `meta`.",
         tags: ["Schools"],
+        security: [["bearerAuth" => []]],
         parameters: [
             new OA\Parameter(name: "search", in: "query", required: false, description: "🔍 كلمة البحث (الاسم، الكود، الرابط، البريد، الهاتف)", schema: new OA\Schema(type: "string")),
             new OA\Parameter(name: "status", in: "query", required: false, description: "📌 تصفية حسب الحالة (`active`, `suspended`, `pending_setup`)", schema: new OA\Schema(type: "string", enum: ["active", "suspended", "pending_setup"])),
@@ -55,6 +56,7 @@ class SchoolDocs
    * إنشاء ملف وظيفي في جدول الكادر الوظيفي `staff` بمسمى **مدير المدرسة**
    * إرجاع بيانات الدخول المبدئية (`manager_credentials`) في الاستجابة لمشاركتها مع المدير.",
         tags: ["Schools"],
+        security: [["bearerAuth" => []]],
         requestBody: new OA\RequestBody(
             required: true,
             description: "بيانات إنشاء المدرسة الجديدة مع إعدادات الاشتراك وحساب المدير",
@@ -130,6 +132,7 @@ class SchoolDocs
 * يجلب بيانات المنشأة التعليمية بالمعرف المميز لها (`UUID`).
 * يدمج تفاصيل الإعدادات والاشتراك تلقائياً في كائن `settings`.",
         tags: ["Schools"],
+        security: [["bearerAuth" => []]],
         parameters: [
             new OA\Parameter(name: "school", in: "path", required: true, description: "🆔 معرف المدرسة الأساسي (UUID)", schema: new OA\Schema(type: "string", format: "uuid"))
         ],
@@ -156,6 +159,7 @@ class SchoolDocs
 * يدعم التعديل الجزئي؛ أرسل فقط الحقول التي تريد تعديلها.
 * يتم تجاهل سجل المدرسة الحالي تلقائياً عند فحص تفرد الكود (`code`) والرابط (`subdomain`).",
         tags: ["Schools"],
+        security: [["bearerAuth" => []]],
         parameters: [
             new OA\Parameter(name: "school", in: "path", required: true, description: "🆔 معرف المدرسة (UUID)", schema: new OA\Schema(type: "string", format: "uuid"))
         ],
@@ -186,7 +190,8 @@ class SchoolDocs
                 )
             ),
             new OA\Response(ref: "#/components/responses/422ValidationError", response: 422),
-            new OA\Response(ref: "#/components/responses/404NotFound", response: 404)
+            new OA\Response(ref: "#/components/responses/404NotFound", response: 404),
+            new OA\Response(ref: "#/components/responses/401Unauthorized", response: 401)
         ]
     )]
     public function update() {}
@@ -200,6 +205,7 @@ class SchoolDocs
 * `suspended`: المدرسة معلقة (مثلاً لانتهاء الاشتراك السحابي) ويُمنع مستخدموها من تسجيل الدخول.
 * `pending_setup`: المدرسة قيد الإعداد المبدئي والتجهيز الأكاديمي.",
         tags: ["Schools"],
+        security: [["bearerAuth" => []]],
         parameters: [
             new OA\Parameter(name: "school", in: "path", required: true, description: "🆔 معرف المدرسة (UUID)", schema: new OA\Schema(type: "string", format: "uuid"))
         ],
@@ -224,7 +230,8 @@ class SchoolDocs
                 )
             ),
             new OA\Response(ref: "#/components/responses/422ValidationError", response: 422),
-            new OA\Response(ref: "#/components/responses/404NotFound", response: 404)
+            new OA\Response(ref: "#/components/responses/404NotFound", response: 404),
+            new OA\Response(ref: "#/components/responses/401Unauthorized", response: 401)
         ]
     )]
     public function changeStatus() {}
@@ -236,6 +243,7 @@ class SchoolDocs
 * يتم وضع علامة الحذف (`deleted_at`) مع الاحتفاظ بالبيانات التاريخية في قاعدة البيانات.
 * يتم تحرير كود المدرسة ورابطها الفرعي للسماح بإعادة استخدامهما مستقبلاً بأمان عبر مؤشر الـ `active_flag`.",
         tags: ["Schools"],
+        security: [["bearerAuth" => []]],
         parameters: [
             new OA\Parameter(name: "school", in: "path", required: true, description: "🆔 معرف المدرسة (UUID)", schema: new OA\Schema(type: "string", format: "uuid"))
         ],
@@ -256,6 +264,7 @@ class SchoolDocs
         description: "### ⚙️ عرض إعدادات المدرسة:
 يجلب تفاصيل الاشتراك السحابي، الهوية البصرية والألوان، توقيت الحصص والدوام الصباحي، وأيام العطلة الأسبوعية.",
         tags: ["School Settings"],
+        security: [["bearerAuth" => []]],
         parameters: [
             new OA\Parameter(name: "school", in: "path", required: true, description: "🆔 معرف المدرسة (UUID)", schema: new OA\Schema(type: "string", format: "uuid"))
         ],
@@ -269,7 +278,8 @@ class SchoolDocs
                     ]
                 )
             ),
-            new OA\Response(ref: "#/components/responses/404NotFound", response: 404)
+            new OA\Response(ref: "#/components/responses/404NotFound", response: 404),
+            new OA\Response(ref: "#/components/responses/401Unauthorized", response: 401)
         ]
     )]
     public function showSettings() {}
@@ -281,6 +291,7 @@ class SchoolDocs
 * يدعم التعديل الجزئي؛ يمكنك إرسال الألوان فقط، أو مواعيد الدوام فقط، أو تمديد فترة الاشتراك.
 * في حال لم تكن الإعدادات منشأة مسبقاً، يتم إنشاؤها تلقائياً للمدرسة.",
         tags: ["School Settings"],
+        security: [["bearerAuth" => []]],
         parameters: [
             new OA\Parameter(name: "school", in: "path", required: true, description: "🆔 معرف المدرسة (UUID)", schema: new OA\Schema(type: "string", format: "uuid"))
         ],

@@ -10,16 +10,16 @@ use OpenApi\Attributes as OA;
     description: "مخطط بيانات المستخدم في النظام",
     properties: [
         new OA\Property(property: "id", type: "string", format: "uuid", example: "8b34ed2c-f01c-4a69-8c4c-b9b3f121dda6"),
-        new OA\Property(property: "school_id", type: "string", format: "uuid", nullable: true, example: null),
-        new OA\Property(property: "username", type: "string", example: "SUPER-ADMIN"),
-        new OA\Property(property: "email", type: "string", format: "email", nullable: true, example: "admin@platform.com"),
-        new OA\Property(property: "phone_number", type: "string", nullable: true, example: "+966500000000"),
+        new OA\Property(property: "school_id", type: "string", format: "uuid", nullable: true, example: "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6c"),
+        new OA\Property(property: "username", type: "string", example: "ROW-ADM-5421"),
+        new OA\Property(property: "email", type: "string", format: "email", nullable: true, example: "manager@alrowad.edu.sa"),
+        new OA\Property(property: "phone_number", type: "string", nullable: true, example: "+966501122334"),
         new OA\Property(property: "avatar_url", type: "string", nullable: true, example: null),
         new OA\Property(
             property: "user_type",
             type: "string",
             enum: ["super_admin", "school_admin", "staff", "student", "parent"],
-            example: "super_admin"
+            example: "school_admin"
         ),
         new OA\Property(
             property: "status",
